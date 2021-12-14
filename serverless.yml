@@ -25,11 +25,24 @@ provider:
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
   profile: max.bildner # this was set up when we ran "serverless config credentials..."
+  environment: # adding environment variables- process.env.tableName
+    tableName: ${self:custom.tableName}
+  iamRoleStatements: # add permissions so lambda can access our dynamoDB
+    - Effect: Allow # an array
+      Action:
+        - dynamoDB:* # * = everymethod in the dynamoDB class
+      Resource: "*" # everything
 
 plugins:
   - serverless-s3-sync
+  - serverless-webpack
+
+# have each of the lambdas packaged individually
+package:
+  individually: true
 
 custom:
+  tableName: users
   s3Sync: # a list of buckets and files we want to sync up
     - bucketName: ethereum-serverless-kickstart-bucket
       localDir: UploadData # folder on our local machine we want to upload to s3
@@ -71,6 +84,21 @@ custom:
 functions:
   hello:
     handler: handler.hello
+  getUser:
+    handler: lambdas/endpoints/getUser.handler
+    events: # trigger for the function
+      - http: # create an api endpoint at "/get-user/{ID}"
+          path: get-user/{ID} # whatever the client passes in ID, will be a pathParameter in event
+          method: GET
+          cors: true
+  getUserAge:
+    handler: lambdas/endpoints/getUserAge.handler
+    events: # trigger for the function
+      - http: # create an api endpoint at "/get-user-age/{ID}"
+          path: get-user-age/{ID} # whatever the client passes in ID, will be a pathParameter in event
+          method: GET
+          cors: true
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -117,6 +145,19 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ethereum-serverless-kickstart-bucket # must be unique!
+    MyDynamoDbTable: # name of resource
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName} # refers to "users" defined in custom field above
+        AttributeDefinitions:
+          - AttributeName: ID # use hyphen "-" to indiciate array
+            AttributeType: S # string
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH # this helps dynamo know what format the attributes are in
+        # BillingMode = how is aws going to let us add/remove/update stuff in table
+        BillingMode: PAY_PER_REQUEST # just pay everytime we read/write from table
+
 # you can add CloudFormation resource templates here
 # resources:
 #  Resources:
