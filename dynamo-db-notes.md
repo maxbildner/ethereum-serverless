@@ -70,6 +70,30 @@ Example 2 of Music Table
   - Flexibility when querying data. For example 2 above, if you provide only the artist, dynamoDB retrieves all of the songs by that artist. And to retrieve a subset of songs by that artist, you can provide the artist and the songTitle
   - Querying time single primary key vs composite key?
 - Can you have a table with items that have different primary keys, but the same sort keys?
+- advantages of .putItem()? why use this at all if you could do 
+  everything with better performance with .updateItem()?
+
+
+## AWS DynamoDB SDK for javascript
+- Docs: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/dynamodb-example-table-read-write.html#dynamodb-example-table-read-write-writing-an-item
+- **DynamoDB.putItem( params )**
+  - Overwrites the whole item (all attributes)
+  - Ex. 
+    ```userId = 1
+    Name= ABC
+    Gender= Male```
+
+    if I use PutItem item with
+    ```UserId = 1
+    Country = India```
+
+    This will replace Name and Gender and now new Item is UserId and Country. 
+  - if you want to update an item with .putItem, you need to send
+    all the attributes in the parameters
+- **DynamoDB.updateItem( params )**
+  - Only updates passed attributes of the item (better performance than .putItem( )
+- You can use .putItem( params) to add a new item to the table as long as the primary key   in the params is unique from the table!
+
 
 ## MISC RESOURCES
 - https://gist.github.com/jlafon/d8f91086e3d00c4bff3b

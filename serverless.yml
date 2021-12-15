@@ -98,6 +98,13 @@ functions:
           path: get-user-age/{ID} # whatever the client passes in ID, will be a pathParameter in event
           method: GET
           cors: true
+  createUserAge:
+    handler: lambdas/endpoints/createUserAge.handler
+    events:
+      - http:
+          path: create-user-age/{ID}
+          method: POST # GET can only pass data from client in url path/header
+          cors: true
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
