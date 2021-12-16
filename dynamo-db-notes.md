@@ -56,6 +56,9 @@ Example 2 of Music Table
   “Price”: 1.99
 }
 
+- In the above music example 2, you can query data items by Artist (partition key), or by  
+  Artist and SongTitle (partition key and sort key). If you wanted to query the data by Genre and Album title, you would create an index in Genre and AlbumTitle. 
+
 - **Compound Key**
   - **Hash** and **Range** Key
 - Only need to define a schema for keys (when you create the table)
@@ -64,14 +67,37 @@ Example 2 of Music Table
   - Table size can’t exceed 10Gb
   - Individual items can’t exceed 400kb
 
+- DynamoDB **Streams**
+  - A stream creates a reference to a before and after of an item after it has been updated
+  - A stream also captures an image of new items added to tables or deleted
+  - They disappear after 24 hours
+  - You can use streams with AWS Lambda to create a trigger. For example, a table that has users. Every time a new user signs up (i.e. is added to the table, you could send a “welcome” email to each new customer. 
+    - Enable stream on a table, then associate that stream with a lambda function
+
+- DynamoDB API
+    - Control Plane
+    - Data Plane
+    - Streams
+    - Transactions
+
+- **Control Plane APIs**
+    - Lets you manage tables, indexes,  streams dependent on tables. Lets you create tables, describe tables (returns info about the table), list tables (returns names of all the tables), update tables (modifies settings of a table or its indexes), and delete tables
+
+- **Data Plane APIs**
+    - CRUD (Create, Read, Update, Delete) items in a table
+    - Ex.
+        - putItem = writes single item to table
+        - batchWriteItem = writes/deletes up to 25 items to a table (more efficient than multiple single putItem
+
 ## QUESTIONS
-- Advantage of dynamo db tables?
+- Advantages/Disadvantages of dynamo db tables?
 - Advantage of partition and sort key (versus just 1 primary key)?
   - Flexibility when querying data. For example 2 above, if you provide only the artist, dynamoDB retrieves all of the songs by that artist. And to retrieve a subset of songs by that artist, you can provide the artist and the songTitle
   - Querying time single primary key vs composite key?
 - Can you have a table with items that have different primary keys, but the same sort keys?
 - advantages of .putItem()? why use this at all if you could do 
   everything with better performance with .updateItem()?
+- Still don’t understand difference between Query vs Scan API’s?
 
 
 ## AWS DynamoDB SDK for javascript
