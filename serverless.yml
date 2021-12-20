@@ -11,6 +11,11 @@
 #
 # Happy Coding!
 
+# Below doesn't work!! (for next js)
+# - see docs: https://serverless-nextjs.com/docs/faq/
+# myNextApp:
+#   component: serverless-next.js
+
 service: ethereum-serverless
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
