@@ -130,3 +130,9 @@ Example 2 of Music Table
   - https://www.youtube.com/watch?v=hOcbHz4T0Eg
   - 1- create GitHub secrets from aws secret access key and id
   - 2- create GitHub action folders/yml file
+
+
+## NEW NOTES
+- Key Condition Expression **Not Equals Operator "<>"**
+  - The KeyConditionExpression doesn't allow not equals for the sort key. However, you can use the "Not Equals i.e. <>" in FilterExpression.
+    - https://stackoverflow.com/questions/44998093/why-is-there-no-not-equal-comparison-in-dynamodb-queries
