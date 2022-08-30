@@ -2,12 +2,12 @@
 
 - Docs:
   - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html
-- Dynamo **Table**
+- Dynamo <ins>**Table**</ins>
   - Made up of unique items?
-- Dynamo **Item**
+- Dynamo <ins>**Item**</ins>
   - An object that can have many key/value pairs
   - Attribute = keys in item
-- **Primary Key** (**Hash Key**)
+- <ins>**Primary Key** (**Hash Key**)</ins>
   - A unique identifier of an item
   - Has one attribute called **Partition Key**
   - Ex. See “ID” below, with the unique value of 1
@@ -29,18 +29,18 @@ Example 1 of Users Table with two user items
 }
 
 - There are Two different kinds of Primary Keys
-  - **Partition Key** (**hash attribute**)
+  - <ins>**Partition Key** (**hash attribute**)</ins>
     - Simple primary key with one attribute called Partition key
     - The value of this key is used under the hood in a hash function, where the output determines the partition (physical storage location?)
-  - Partition Key and **Sort Key** (together aka **Composite Primary Key**)
+  - Partition Key and <ins>**Sort Key**</ins> (together aka <ins>**Composite Primary Key**</ins>)
     - Made of two attributes:
-      - 1st attribute = **Partition Key**
-      - 2nd attribute = **Sort Key**
+      - 1st attribute = <ins>**Partition Key**</ins>
+      - 2nd attribute = <ins>**Sort Key**</ins>
     - You can have multiple items with the same portion key value (but sort key values must be different)
     - All items with the same partition key value are stored together in sorted order by the sort key value
     - Accessing an item requires both the primary key and the sort key
 
-- **Secondary Indexes** (Secondary Key?)
+- <ins>**Secondary Indexes**</ins> (Secondary Key?)
   - Another key/value attribute of an item that is required (if you use it)
   - See example 2 below where “SongTitle” is the Secondary Index and “Artist” is the Primary Key
 
@@ -59,15 +59,15 @@ Example 2 of Music Table
 - In the above music example 2, you can query data items by Artist (partition key), or by  
   Artist and SongTitle (partition key and sort key). If you wanted to query the data by Genre and Album title, you would create an index in Genre and AlbumTitle. 
 
-- **Compound Key**
-  - **Hash** and **Range** Key
+- <ins>**Compound Key**</ins>
+  - <ins>**Hash Key**</ins> and <ins>**Range** Key</ins>
 - Only need to define a schema for keys (when you create the table)
 - Items are accessed using their primary key
-- **Limits**
+- <ins>**Limits**</ins>
   - Table size can’t exceed 10Gb
   - Individual items can’t exceed 400kb
 
-- DynamoDB **Streams**
+- DynamoDB <ins>**Streams**</ins>
   - A stream creates a reference to a before and after of an item after it has been updated
   - A stream also captures an image of new items added to tables or deleted
   - They disappear after 24 hours
@@ -80,10 +80,10 @@ Example 2 of Music Table
     - Streams
     - Transactions
 
-- **Control Plane APIs**
+- <ins>**Control Plane APIs**</ins>
     - Lets you manage tables, indexes,  streams dependent on tables. Lets you create tables, describe tables (returns info about the table), list tables (returns names of all the tables), update tables (modifies settings of a table or its indexes), and delete tables
 
-- **Data Plane APIs**
+- <ins>**Data Plane APIs**</ins>
     - CRUD (Create, Read, Update, Delete) items in a table
     - Ex.
         - putItem = writes single item to table
@@ -102,7 +102,7 @@ Example 2 of Music Table
 
 ## AWS DynamoDB SDK for javascript
 - Docs: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/dynamodb-example-table-read-write.html#dynamodb-example-table-read-write-writing-an-item
-- **DynamoDB.putItem( params )**
+- <ins>**DynamoDB.putItem( params )**</ins>
   - Overwrites the whole item (all attributes)
   - Ex. 
     ```userId = 1
@@ -116,7 +116,7 @@ Example 2 of Music Table
     This will replace Name and Gender and now new Item is UserId and Country. 
   - if you want to update an item with .putItem, you need to send
     all the attributes in the parameters
-- **DynamoDB.updateItem( params )**
+- <ins>**DynamoDB.updateItem( params )**</ins>
   - Only updates passed attributes of the item (better performance than .putItem( )
 - You can use .putItem( params) to add a new item to the table as long as the primary key   in the params is unique from the table!
 
@@ -133,26 +133,25 @@ Example 2 of Music Table
 
 
 ## NEW NOTES
-- **KeyConditionExpression** 
+- <ins>**KeyConditionExpression**</ins>
   - This is a key in params when you make a dynamo query
   - It will be evaluated Before doing the query/write, if the expression evaluates to false, the write will be aborted
   - KeyConditionExpression accepts only key attributes, hash key and range key. Any other non-key attribute used in conditions will result in a validation error.
   - https://www.alexdebrie.com/posts/dynamodb-condition-expressions/#:~:text=A%20ConditionExpression%20is%20an%20optional,the%20write%20will%20be%20aborted
 
-- KeyConditionExpression **Not Equals Operator "<>"**
+- KeyConditionExpression <ins>**Not Equals Operator "<>"**</ins>
   - The KeyConditionExpression doesn't allow not equals for the sort key. However, you can use the "Not Equals i.e. <>" in FilterExpression.
     - https://stackoverflow.com/questions/44998093/why-is-there-no-not-equal-comparison-in-dynamodb-queries
 
 4/19/22
-- **Condition Expression (ConditionExpression)**
+- <ins>**Condition Expression (ConditionExpression)**</ins>
   - https://www.alexdebrie.com/posts/dynamodb-condition-expressions/
   - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
   - Optional parameter when making a query (on write-operations)
   - Expression will be evaluated BEFORE the write. If expression evaluates to false, the write will be aborted
 
 5/16/22
-- **Projection Expression**
+- <ins>**Projection Expression**</ins> (ProjectionExpression)
     - If you want to return only some attributes from a dynamo query
     - By default operations like GetItem/Query/Scan return all attributes
     - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ProjectionExpressions.html
-    - ProjectionExpression
