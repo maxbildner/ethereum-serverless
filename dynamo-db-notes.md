@@ -1,5 +1,7 @@
-# DYNAMO DB NOTES
-
+# AWS DYNAMO DB NOTES
+- <ins>**DATA TYPES**</ins> JavaScript Syntax
+  - [https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html)
+  
 - Docs:
   - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html
 - Dynamo <ins>**Table**</ins>
@@ -133,15 +135,59 @@ Example 2 of Music Table
 
 
 ## NEW NOTES
-- <ins>**KeyConditionExpression**</ins>
-  - This is a key in params when you make a dynamo query
-  - It will be evaluated Before doing the query/write, if the expression evaluates to false, the write will be aborted
-  - KeyConditionExpression accepts only key attributes, hash key and range key. Any other non-key attribute used in conditions will result in a validation error.
-  - https://www.alexdebrie.com/posts/dynamodb-condition-expressions/#:~:text=A%20ConditionExpression%20is%20an%20optional,the%20write%20will%20be%20aborted
+8/30/22
+- <ins>**Expression Attribute Values**</ins> (ExpressionAttributeValues)
+  - These are placeholder values that you don’t know until the query is run
+  - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeValues.html
+  - Ex. Awsinfra/functions/packages/.../Transactions.js / Transactions.get()
+    ```
+    const tx_query = new QueryCommand({
+          TableName: "sdk_transactions",
+          IndexName: "step_index",
+          KeyConditionExpression: "step = :s AND inserted > :y",
+          ExpressionAttributeValues: { ":s": { S: step }, ":y": { N: String(last) } }
+      })
+      response.data = await dbClient.send(tx_query)
+    ```
+    - If the .get(“pending”, 0)
+    - This gets all the items in the sdk_transactions table where the item step == “pending” AND item inserted > 0
+  - Why does dynamo require ExpressionAttributeValues?
+    - https://stackoverflow.com/questions/31816906/why-does-dynamodb-require-expressionattributevalue
 
-- KeyConditionExpression <ins>**Not Equals Operator "<>"**</ins>
-  - The KeyConditionExpression doesn't allow not equals for the sort key. However, you can use the "Not Equals i.e. <>" in FilterExpression.
-    - https://stackoverflow.com/questions/44998093/why-is-there-no-not-equal-comparison-in-dynamodb-queries
+8/16/22
+- Using <ins>**updateItemCommand**, but removing an attribute/value</ins> at the same time!
+  - REMOVE
+  - https://stackoverflow.com/questions/45170123/remove-nested-attribute-in-dynamodb
+  - https://stackoverflow.com/questions/44022584/how-to-set-and-delete-using-a-single-updateexpression-with-dynamo
+  - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.REMOVE
+  - Example Syntax:
+    - https://github.com/.../awsinfra/commit/2ddad6097aecb67aa7470436f8c3e36a5746768a
+    ```
+    static async createDraft(body, user_id) {
+      let updateParams = {
+        TableName: "users",
+        Key: {
+            user_id: { S: String(user_id) },
+            inserted: { N: String(body.inserted) }
+        },
+        UpdateExpression:
+           "collection_name = :cn, chain = :ch, REMOVE royalties_collector_wallet, royalty_fee_basis_points", 
+        ExpressionAttributeValues: {
+          ":cn": { S: body.collection_name }, 
+          ":ch": { S: body.chain }, 
+        },
+        ReturnValues: "ALL_NEW"
+      }
+      const updateOrPutItem = new UpdateItemCommand(updateParams)
+      return updateOrPutItem
+    }
+    ```
+
+5/16/22
+- <ins>**Projection Expression**</ins> (ProjectionExpression)
+  - If you want to return only some attributes from a dynamo query
+  - By default operations like GetItem/Query/Scan return all attributes
+  - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ProjectionExpressions.html
 
 4/19/22
 - <ins>**Condition Expression (ConditionExpression)**</ins>
@@ -150,8 +196,38 @@ Example 2 of Music Table
   - Optional parameter when making a query (on write-operations)
   - Expression will be evaluated BEFORE the write. If expression evaluates to false, the write will be aborted
 
-5/16/22
-- <ins>**Projection Expression**</ins> (ProjectionExpression)
-    - If you want to return only some attributes from a dynamo query
-    - By default operations like GetItem/Query/Scan return all attributes
-    - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ProjectionExpressions.html
+- <ins>**KeyConditionExpression**</ins>
+  - This is a key in params when you make a dynamo query
+  - It will be evaluated Before doing the query/write, if the expression evaluates to false, the write will be aborted
+  - KeyConditionExpression accepts only key attributes, hash key and range key. Any other non-key attribute used in conditions will result in a validation error.
+  - https://www.alexdebrie.com/posts/dynamodb-condition-expressions/#:~:text=A%20ConditionExpression%20is%20an%20optional,the%20write%20will%20be%20aborted
+
+4/8/22
+- <ins>**Key Condition Expression**</ins> (KeyConditionExpression)
+    - This is a key in params when you make a dynamo query
+    - It will be evaluated Before doing the query/write, if the expression evaluates to false, the write will be aborted
+    - https://www.alexdebrie.com/posts/dynamodb-condition-expressions/#:~:text=A%20ConditionExpression%20is%20an%20optional,the%20write%20will%20be%20aborted
+    
+- KeyConditionExpression <ins>**Not Equals Operator "<>"**</ins>
+  - The KeyConditionExpression doesn't allow not equals for the sort key. However, you can use the "Not Equals i.e. <>" in FilterExpression.
+    - https://stackoverflow.com/questions/44998093/why-is-there-no-not-equal-comparison-in-dynamodb-queries
+
+1/31/22
+- Syntax <ins>**KeyConditionExpression**</ins>
+  - accepts only key attributes, hash key and range key. Any other non-key attribute used in conditions will result in a validation error.
+  - https://forums.aws.amazon.com/thread.jspa?threadID=221161
+
+
+1/27/22
+- CAN'T HAVE EMPTY ARRAY OF STRINGS or NUMBERS in DYNAMO DB item values (unless array of map objects)
+- CAN HAVE EMPTY ARRAY of MAP
+
+12/10/21
+- Dynamo <ins>**Dynamo UPDATE vs PUT**</ins>
+  - https://stackoverflow.com/questions/51155814/what-is-the-different-between-put-item-and-update-UPDATE vs PUT
+  - https://stackoverflow.com/questions/51155814/what-is-the-different-between-put-item-and-update-
+
+
+
+
+
