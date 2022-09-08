@@ -135,6 +135,10 @@ Example 2 of Music Table
 
 
 ## NEW NOTES
+9/8/22
+- <ins>**Projection Expression (ProjectionExpression)**</ins>
+  - Removing this from a query, will return ALL the attributes/values of a table item
+
 8/30/22
 - <ins>**Expression Attribute Values**</ins> (ExpressionAttributeValues)
   - These are placeholder values that you don’t know until the query is run
