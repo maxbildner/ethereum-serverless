@@ -135,6 +135,22 @@ Example 2 of Music Table
 
 
 ## NEW NOTES
+9/27/22
+- <ins>**Conditional Operator (ConditionalOperator)**</ins>
+    - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.ConditionalOperator.html
+    - Logical operator applied to
+        - Query -> FilterExpression
+        - getItem -> ProjectionExpression
+        - putItem -> ConditionExpression
+        - Scan -> FilterExpression
+    - AND - if all conditions are true, then the entire map evaluates to true
+    - OR- if at least on of the conditions evaluate to true, then the entire map evaluates to true
+    - See conditionExpression for example
+    - If you omit this, AND is the default
+    - This parameter does not support List or Map
+- <ins>Legacy Conditional Parameters</ins>
+    - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.html
+
 9/8/22
 - <ins>**Projection Expression (ProjectionExpression)**</ins>
   - Removing this from a query, will return ALL the attributes/values of a table item
