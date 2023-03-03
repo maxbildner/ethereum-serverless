@@ -135,6 +135,94 @@ Example 2 of Music Table
 
 
 ## NEW NOTES
+3/3/23
+- **IF NOT EXISTS** <ins>**if_not_exists**</ins> UpdateExpression
+    - Ex. 1 See awsinfra/packages/idexodata/Jobs.js/ nonce method
+    - Used to avoid overwriting an existing attribute
+    - **if_not_exists (path, value)**
+        - **If item has no attribute at the specified path, if_not_exists evaluates to value, otherwise it returns path**
+    - Ex 2. awsinfra/functions/packages/idexodata/Vault.js/nextHdIndex() Line #22
+      ```
+        new UpdateItemCommand({
+            TableName: "vault_wallet_index",
+            Key: { seed_id: { S: seed_id } },
+            UpdateExpression: "SET hd_index = if_not_exists(hd_index, :initial) + :incr",
+            ExpressionAttributeValues: {
+                ":incr": { N: "1" },
+                ":initial": { N: "-1" }
+            },
+            ReturnValues: "UPDATED_NEW"
+        })
+      ```
+
+
+3/3/23
+- <ins>**TIME TO LIVE (TTL)** / terraform ttl</ins>
+    - Ex. awsinfra/terraform/dynamodb_vault_wallet.tf
+    - Allows you to define a per-table item time stamp to determine when an item is no longer needed
+    - Ex. Remove sensitive data in table after a certain time period
+    ```
+        resource "aws_dynamodb_table" "vault_wallet_index" {
+      name         = "vault_wallet_index"
+      billing_mode = "PAY_PER_REQUEST"
+      hash_key     = "seed_id"
+
+      attribute {
+        name = "seed_id"
+        type = "S"
+      }
+
+      ttl {
+        attribute_name = "ttl" // can be named anything we want
+        enabled        = true
+      }
+    }
+    ```
+
+2/7/23
+- <ins>**ConditionalCheckFailedException**</ins>
+    - Error thrown by AWS when **ConditionExpression** evaluates to false
+    - https://dynobase.dev/dynamodb-errors/dynamodb-conditionalcheckfailedexception/
+    - Ex. Occurred after we added a new lambda function using terraform
+    - **Condition Expression** used for:
+      * Create an item if such doesn't exist yet
+      * Delete an item only if some attribute is defined
+      * Update user attribute only if user is active
+
+
+12/20/22
+- <ins>AWS **CLI BASH** TERMINAL COMMAND **GET TABLE ITEM COUNT**</ins>
+    ```
+      aws dynamodb query \
+      --table-name collection_uris \
+      --key-condition-expression "collection_id = :collection_id" \
+      --expression-attribute-values '{ ":collection_id": { "S": "0x51bb9b9ccdf04af385b8356f41e20140badf80a0#polygon" } }' \
+      --select "COUNT"
+    ```
+
+
+12/14/22
+- <ins>**SCAN** vs **QUERY**</ins>
+    - **QUERY** = uses primary key. uses either hash key (pk) or composite key (hash + range key) to find info
+      - efficient
+    - **SCAN** = searches entire table!
+      - sort-key (range key) allows scanning order direction. 
+      - not as efficient
+
+
+11/23/22
+- <ins>**FilterExpression**</ins> (FILTER EXPRESSION)
+    - Applied after the operation (ex. Query, scan...), and before results are returned
+    - Does not contribute to optimizing the operation!!!
+    - https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
+    - https://www.alexdebrie.com/posts/dynamodb-filter-expressions/
+    - https://dynobase.dev/dynamodb-filterexpression/
+    - applied after a Query finishes, but before the results are returned. 
+    - If FilterExpression evaluates to true then remove all items that match that expression
+    - This is a way to filter OUT items in a query
+    - A FilterExpression cannot contain partition key or sort key attributes. You need to specify those attributes in the KeyConditionExpression
+    - More efficient ways to filter than this if we use partition key
+
 9/27/22
 - <ins>**Conditional Operator (ConditionalOperator)**</ins>
     - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.ConditionalOperator.html
